@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { default as Home } from \"./home\";","map":{"version":3,"sources":["H:/dev/my_workflow/my-app/src/client/page/index.tsx"],"names":["default","Home"],"mappings":"AAAA,SAASA,OAAO,IAAIC,IAApB,QAAgC,QAAhC","sourcesContent":["export { default as Home } from \"./home\";\r\n"]},"metadata":{},"sourceType":"module"}
