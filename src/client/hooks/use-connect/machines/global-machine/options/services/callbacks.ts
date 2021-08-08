@@ -5,15 +5,27 @@ import { IRecord } from "../../types";
 import io from "socket.io-client";
 import { connect } from "http2";
 
-const toSessionKey = (workflow_type: string, instance: string | number) => `session:${workflow_type}-${instance}`;
+const toSessionKey = (workflow_type: string, instance: string | number) =>
+    `session:${workflow_type}-${instance}`;
 
 const services: IRecord<ServiceConfig<IContext, IMachineEvents>> = {
     connectToSocketServer: (context) => (send, onEvent) => {
-        const { workflow_type, instance, namespace = "/socket.io", session_token: replicated_session_token, socket_host = "" } = context;
+        const {
+            workflow_type,
+            instance,
+            namespace = "/socket.io",
+            session_token: replicated_session_token,
+            socket_host = "",
+        } = context;
 
-        const session_token = replicated_session_token ? replicated_session_token : store.get(toSessionKey(workflow_type, instance));
+        const session_token = replicated_session_token
+            ? replicated_session_token
+            : store.get(toSessionKey(workflow_type, instance));
 
-        console.log(`replicated_session_token ${workflow_type}`, replicated_session_token);
+        console.log(
+            `replicated_session_token ${workflow_type}`,
+            replicated_session_token
+        );
         console.log(`SESSION TOKEN USED ${workflow_type}`, session_token);
 
         // const socket = io({

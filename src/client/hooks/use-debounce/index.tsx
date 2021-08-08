@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 interface ISend {
     type: string;
@@ -19,19 +19,27 @@ export const useDebounce = ({
     actions_type,
     send,
 }: IDebounceParams) => {
-    const [state, setState] = useState();
+    const [state, setState] = useState("");
+
+    useEffect(() => {
+        input && input != undefined && input != null && setState(input);
+    }, [input]);
+
+    console.log("DEBOUNCE STATE:", state);
+
     useEffect(() => {
         // do something
         const timeout = setTimeout(() => {
             console.log("DEBOUNCE INPUT:", input);
-            send({
-                type: actions_type,
-                payload: input,
-            });
+            input &&
+                send({
+                    type: actions_type,
+                    payload: input,
+                });
         }, delay);
         return () => {
             clearTimeout(timeout);
             console.log("clearing timeout");
         };
-    }, [dependency]);
+    }, [state]);
 };

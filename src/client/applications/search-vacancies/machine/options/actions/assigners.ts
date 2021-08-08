@@ -1,38 +1,16 @@
-import { ActionFunctionMap, assign } from 'xstate';
-import { IContext, IMachineEvents } from '../../types';
-import store from 'store2';
-
-const toSessionKey = (workflow_type: string, instance: string | number) =>
-  `session:${workflow_type}-${instance}`;
-
-const toCacheKey = (workflow_type: string, instance: string | number) =>
-  `state:${workflow_type}-${instance}`;
+import { ActionFunctionMap, assign } from "xstate";
+import { IContext, IMachineEvents } from "../../types";
 
 const actions: ActionFunctionMap<IContext, IMachineEvents> = {
-  saveSessionToken: ({ workflow_type, instance }, { payload }) => {
-    store.set(toSessionKey(workflow_type, instance), payload);
-  },
-  assignWorkflowState: assign({
-    workflow_state: (_, { payload }) => {
-      try {
-        return payload;
-      } catch (error) {
-        return undefined;
-      }
-    },
-  }),
-  setWorkflowStateCache: async ({ workflow_type, instance }, { payload }) =>
-    // return store.set(`cache:${workflow_type}:state`, payload);
-    store.set(toCacheKey(workflow_type, instance), payload),
-  applyCachedState: assign({
-    workflow_state: (_, { data: cached_state }) => {
-      try {
-        return cached_state;
-      } catch (error) {
-        return undefined;
-      }
-    },
-  }),
+    assignQueryTermsToContext: assign({
+        query: (_, { payload }) => payload,
+    }),
+
+    assignQueryResultsToContext: assign({
+        query_results: ({ query_results }, { payload }) => {
+            return [...query_results, ...payload.results];
+        },
+    }),
 };
 
 export default actions;

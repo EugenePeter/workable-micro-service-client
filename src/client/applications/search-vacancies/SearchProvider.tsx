@@ -14,16 +14,19 @@ const SearchVacanciesProvider = (props) => {
     const [state, send] = startMachine({
         message: "test",
     });
-    const [actor, compare, interpretedSend] = peekMachine();
+    const [actor, compare, interpretedSend, interpret, useSelector] =
+        peekMachine();
     console.log("ACTOR:", actor);
-    // console.log("STATE:", state);
+    console.log("COMPARE:", compare);
 
     const actions = {
         interpretedSend,
         send,
     };
     return (
-        <SearchContext.Provider value={{ state, actor, actions }}>
+        <SearchContext.Provider
+            value={{ state, actor, actions, interpret, useSelector }}
+        >
             <DispatchSearch.Provider value={"test"}>
                 {props.children}
             </DispatchSearch.Provider>

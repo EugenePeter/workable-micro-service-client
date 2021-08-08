@@ -5,60 +5,50 @@ import { IRecord } from "../../types";
 import io from "socket.io-client";
 import { connect } from "http2";
 
-const toSessionKey = (workflow_type: string, instance: string | number) => `session:${workflow_type}-${instance}`;
+const toSessionKey = (workflow_type: string, instance: string | number) =>
+    `session:${workflow_type}-${instance}`;
 
 const services: IRecord<ServiceConfig<IContext, IMachineEvents>> = {
     connectToSocketServer: (context) => (send, onEvent) => {
-        const { workflow_type, instance, namespace = "/socket.io", session_token: replicated_session_token, socket_host = "" } = context;
+        const { socket_host, query } = context;
 
-        const session_token = replicated_session_token ? replicated_session_token : store.get(toSessionKey(workflow_type, instance));
-
-        console.log(`replicated_session_token ${workflow_type}`, replicated_session_token);
-        console.log(`SESSION TOKEN USED ${workflow_type}`, session_token);
-
-        // const socket = io({
-        //   query: {
-        //     session_token,
-        //   },
-        // });
-
-        const socket = io({
-            host: socket_host ? socket_host : undefined,
-            path: namespace,
-            query: {
-                session_token,
-            },
-        });
-
-        const handleConnection = () => {
+        const socket = io(socket_host);
+        console.log("IM AM RUNNING", socket);
+        const socketConnected = () => {
             console.log("SOCKET CONNECTED");
             send("CONNECTED");
         };
-        const handleDisconnection = () => {
-            console.log(`DISCONNECTED`);
-            send("DISCONNECTED");
+        const socketDisonnected = () => {
+            console.log("SOCKET DISCONNECTED");
+            send("SOCKET DISCONNECTED");
         };
-        const handleMessage = (data: AnyEventObject) => {
-            send(data);
+        const handleQueryResponse = (data: AnyEventObject) => {
+            console.log("DATA:", data);
+            send({
+                type: "GOT_QUERY_RESULTS",
+                payload: data,
+            });
         };
 
-        socket.on("connect", handleConnection);
-        socket.on("disconnect", handleDisconnection);
-        socket.on("message", handleMessage);
+        socket.on("connect", socketConnected);
+        socket.on("disconnect", socketDisonnected);
+        socket.on("query_response", handleQueryResponse);
 
-        onEvent((event: AnyEventObject) => {
-            console.log(`Event:`, event);
-            socket.emit("message", event);
-        });
+        socket.emit("query", query);
 
-        return () => {
-            socket.removeListener("connect", handleConnection);
-            socket.removeListener("disconnect", handleDisconnection);
-            socket.removeListener("message", handleMessage);
-        };
+        // onEvent((event: AnyEventObject) => {
+        //     console.log("MESSAGE RECIEVED FROM OWN MACHINE:", event);
+        //     socket.emit("query", event);
+        // });
+
+        // return () => {
+        //     socket.removeListener("connect", socketConnected);
+        //     socket.removeListener("disconnect", socketDisonnected);
+        //     socket.removeListener("message", handleMessage);
+        // };
     },
 
-    connectToSocketServer2: (context) => (send) => {},
+    // connectToSocketServer2: (context) => (send) => {},
 };
 
 export default services;

@@ -5,6 +5,8 @@ import { IContext } from "./types";
 import config from "./config";
 import options from "./options";
 
+const { PLATFORM_SOCKET_HOST = "http://localhost:3000" } = process.env;
+
 const initial_context: any = {
     machine_type: "",
     test: "hey",
@@ -12,6 +14,9 @@ const initial_context: any = {
         message: "this is a message",
     },
     message: "",
+    socket_host: PLATFORM_SOCKET_HOST,
+    query: "",
+    query_results: [],
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -45,7 +50,7 @@ export const peekMachine = () => {
     const { send: interpretedSend } = interpret;
     const [actor] = useActor(interpret);
     const compare = useSelector(interpret, condition);
-    return [actor, compare, interpretedSend];
+    return [actor, compare, interpretedSend, interpret, useSelector];
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

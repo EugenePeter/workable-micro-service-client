@@ -13,7 +13,9 @@ export interface IContext {
     params?: any;
     persist?: boolean;
     session_token?: string;
-    socket_host?: string;
+    socket_host: string;
+    query?: string;
+    query_results?: object[];
 }
 
 export type IMachineEvents = AnyEventObject;
